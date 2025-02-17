@@ -1,101 +1,475 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
+
+// Función para enviar email directamente desde el cliente (¡exponer la API key es peligroso!)
+async function sendEmail(contactData: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      // Se envía la API key en el header Authorization (expuesta en el cliente)
+      Authorization: "Bearer re_X4o7g7VW_4GLWb1FaXQ1eQywCJVs4BkiQ",
+    },
+    body: JSON.stringify({
+      from: "onboarding@resend.dev",
+      to: "octabevi@protonmail.com",
+      subject: `Nuevo mensaje de ${contactData.name}: ${contactData.subject}`,
+      html: `<p><strong>Nombre:</strong> ${contactData.name}</p>
+             <p><strong>Email:</strong> ${contactData.email}</p>
+             <p><strong>Mensaje:</strong></p>
+             <p>${contactData.message}</p>`,
+    }),
+  });
+  return res.json();
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const technologies = [
+    { name: "Java", gradient: "from-red-500 to-yellow-500" },
+    { name: "Spring Boot", gradient: "from-green-500 to-blue-500" },
+    { name: "Python", gradient: "from-blue-400 to-green-400" },
+    { name: "PHP", gradient: "from-indigo-500 to-pink-500" },
+    { name: "Laravel", gradient: "from-red-600 to-orange-600" },
+    { name: "Flutter", gradient: "from-blue-300 to-blue-500" },
+    { name: "MySQL", gradient: "from-blue-600 to-blue-800" },
+    { name: "MariaDB", gradient: "from-purple-500 to-purple-700" },
+    { name: "PostgreSQL", gradient: "from-indigo-600 to-blue-600" },
+    { name: "NextJs", gradient: "from-gray-700 to-gray-900" },
+    { name: "Angular", gradient: "from-red-500 to-red-700" },
+    { name: "HTML", gradient: "from-orange-400 to-orange-600" },
+    { name: "CSS", gradient: "from-blue-400 to-blue-600" },
+    { name: "TailwindCSS", gradient: "from-sky-400 to-blue-400" },
+  ];
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+  const articles = [
+    {
+      title: "ASP.NET Core 9.0 API with Angular",
+      date: "Noviembre 19, 2024",
+      summary:
+        "Tutorial de como crear un proyecto con ASP.NET Core 9.0 integrado con AngularJs",
+      link: "https://javascript.plainenglish.io/asp-net-core-9-0-api-with-angular-332c70072e17",
+    },
+    {
+      title: "Top 10 Laravel Plugins",
+      date: "Julio 25, 2024",
+      summary:
+        "Descubre los 10 plugins más utilizados y conocidos para Laravel",
+      link: "https://medium.com/stackademic/top-10-laravel-plugins-d7786e9ceb02",
+    },
+    {
+      title: "5 Amazing UI Libraries for Next.js",
+      date: "Julio 25, 2024",
+      summary:
+        "Descubre cinco de las mejores librerías UI para Next.js",
+      link: "https://medium.com/@octabevi/5-amazing-ui-libraries-for-next-js-2f9417cd7a99",
+    },
+    {
+      title: "Create Next.js project with JWT Authentication and Prisma ORM",
+      date: "Julio 21, 2024",
+      summary:
+        "Creación de un projecto en Next.js con autenticación mediante JWT y Prisma",
+      link: "https://medium.com/stackademic/create-next-js-project-with-jwt-authentication-and-prisma-orm-5a08f547cdb4",
+    },
+    {
+      title: "Top 5 Visual Studio Code Plugins for Next.js Development",
+      date: "Julio 25, 2024",
+      summary:
+        "Descubre cinco plugins de Next.js para Visual Studio Code",
+      link: "https://medium.com/@octabevi/top-5-visual-studio-code-plugins-for-next-js-development-de3717ff6072",
+    },
+  ];
+
+  // Estados para el formulario y modal de contacto
+  const [contactData, setContactData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [status, setStatus] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setContactData({ ...contactData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("Enviando...");
+    try {
+      const response = await sendEmail(contactData);
+      console.log(response);
+      setStatus("Mensaje enviado correctamente.");
+      setContactData({ name: "", email: "", subject: "", message: "" });
+      setShowModal(true);
+    } catch (error) {
+      console.error(error);
+      setStatus("Error al enviar el mensaje. Inténtalo de nuevo.");
+    }
+  };
+
+  return (
+    <main className="min-h-screen w-full flex flex-col items-center bg-gray-50 text-gray-800 font-sans">
+      {/* Modal de éxito */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 text-center">
+            <p className="mb-4 text-lg font-semibold">
+              Mensaje enviado correctamente.
+            </p>
+            <button
+              onClick={() => {
+                setShowModal(false);
+                window.location.reload();
+              }}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-md"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Portada (Hero Section) con nuevo gradient moderno */}
+      <section className="w-full h-[80vh] flex flex-col justify-center items-center bg-gradient-to-br from-teal-500 to-blue-500 text-white px-8">
+        <div className="mb-6">
+          <Image
+            src="/octavio.jpg"
+            alt="Foto de Octavio"
+            width={150}
+            height={150}
+            className="rounded-full border-4 border-white"
+          />
+        </div>
+        {/* Nombre con efecto typewriter con nuevos colores */}
+        <h1 className="typewriter text-5xl sm:text-7xl font-bold mb-4 text-center">
+          Octavio Bernal Vilana
+        </h1>
+        {/* Iconos sociales en contenedores */}
+        <div className="flex gap-4 mb-4">
           <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://www.linkedin.com/in/octavio-bernal-vilana-lk/"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            className="flex items-center justify-center h-12 w-12 rounded-full bg-[#0A66C2] text-white"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.762 2.239 5 5 5h14c2.762 0 5-2.238 5-5v-14c0-2.761-2.238-5-5-5zm-11.5 19h-3v-9h3v9zm-1.5-10.25c-.966 0-1.75-.783-1.75-1.75 0-.966.784-1.75 1.75-1.75s1.75.784 1.75 1.75c0 .967-.784 1.75-1.75 1.75zm13.5 10.25h-3v-4.5c0-1.076-.024-2.463-1.5-2.463-1.5 0-1.73 1.172-1.73 2.383v4.58h-3v-9h2.885v1.23h.041c.403-.762 1.387-1.563 2.855-1.563 3.054 0 3.619 2.012 3.619 4.626v4.707z" />
+            </svg>
           </a>
           <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://medium.com/@octabevi"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Blog"
+            className="flex items-center justify-center h-12 w-12 rounded-full bg-white text-black border border-gray-300"
           >
-            Read our docs
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"
+              />
+            </svg>
+          </a>
+          <a
+            href="https://github.com/OctavioBernalGH"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            className="flex items-center justify-center h-12 w-12 rounded-full bg-black text-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 0a12 12 0 00-3.79 23.4c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.4-1.34-1.77-1.34-1.77-1.09-.75.08-.74.08-.74 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.8 1.3 3.48.99.11-.77.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.93.43.37.81 1.1.81 2.23v3.31c0 .32.21.69.82.57A12 12 0 0012 0z" />
+            </svg>
+          </a>
+          <a
+            href="mailto:octabevi@protonmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Gmail"
+            className="flex items-center justify-center h-12 w-12 rounded-full bg-[#D14836] text-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 13.065L2 6.747V18a2 2 0 002 2h16a2 2 0 002-2V6.747l-10 6.318zM22 4H2a2 2 0 00-2 2v.401l12 7.573 12-7.573V6a2 2 0 00-2-2z" />
+            </svg>
           </a>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">
+          Full Stack Developer &amp; IT Manager
+        </h2>
+        <p className="max-w-xl text-center text-lg">
+          ¡Hola! Soy un apasionado de la tecnología, el desarrollo de software y la
+          gestión de infraestructuras IT. Me encanta resolver problemas y construir
+          soluciones modernas que destaquen por su rendimiento y calidad.
+        </p>
+      </section>
+
+      {/* Sección "Sobre mí" */}
+      <section className="w-full max-w-5xl px-6 py-12">
+        <h3 className="text-3xl sm:text-4xl font-extrabold mb-4 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
+          Sobre mí
+        </h3>
+        <p className="leading-relaxed text-lg text-center">
+          Llevo varios años trabajando como desarrollador Full Stack, manejando tanto
+          frontend como backend. Además, soy IT Manager, lo que me permite coordinar equipos
+          y asegurar la disponibilidad de servicios de forma eficiente. Me apasionan las
+          tecnologías web, la arquitectura de software y el trabajo colaborativo.
+        </p>
+      </section>
+
+      {/* Sección "Tecnologías" */}
+      <section className="w-full max-w-5xl px-6 py-12">
+        <h3 className="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">
+          Tecnologías
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+          {technologies.map((tech, idx) => (
+            <div
+              key={idx}
+              className={`rounded-lg shadow-lg p-4 bg-gradient-to-r ${tech.gradient} text-white text-center font-bold text-lg`}
+            >
+              {tech.name}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Sección "Artículos Recientes" */}
+      <section className="w-full max-w-5xl px-6 py-12">
+        <h3 className="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
+          Artículos Recientes
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {articles.map((article, idx) => (
+            <div
+              key={idx}
+              className="rounded-lg shadow-md bg-white p-6 flex flex-col"
+            >
+              <h4 className="text-xl font-semibold mb-2">{article.title}</h4>
+              <p className="text-sm text-gray-500 mb-1">{article.date}</p>
+              <p className="text-sm text-gray-700 mb-4">{article.summary}</p>
+              <div className="mt-auto">
+                <a
+                  href={article.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold"
+                >
+                  Leer más →
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Sección "Proyectos Destacados" */}
+      <section className="w-full max-w-5xl px-6 py-12">
+        <h3 className="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
+          Proyectos Destacados
+        </h3>
+        <div className="grid gap-8 sm:grid-cols-2">
+          <div className="rounded-lg shadow-md bg-white p-6">
+            <Image
+              src="/prosp2.png"
+              alt="Plataforma PROSP2"
+              width={600}
+              height={400}
+              className="rounded-md mb-4 object-cover w-full h-40"
+            />
+            <h4 className="text-xl font-semibold mb-2">
+              Plataforma de Seguridad del paciente: PROSP2
+            </h4>
+            <p className="text-sm text-gray-600 mb-2">
+              Aplicación para la gestión de listas de verificaciones en ámbitos sanitarios.
+            </p>
+            <a
+              href="https://prosp.salut.gencat.cat/login"
+              className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
+            >
+              Ver más →
+            </a>
+          </div>
+          <div className="rounded-lg shadow-md bg-white p-6">
+            <Image
+              src="/iam.png"
+              alt="Código del infarto"
+              width={600}
+              height={400}
+              className="rounded-md mb-4 object-cover w-full h-40"
+            />
+            <h4 className="text-xl font-semibold mb-2">
+              Código IAM (Código del Infarto)
+            </h4>
+            <p className="text-sm text-gray-600 mb-2">
+              Aplicación utilizada para gestionar el evento e informar sobre el código IAM referente a la detección del infarto.
+            </p>
+            <a
+              href="https://iam.icscampdetarragona.cat/"
+              className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
+            >
+              Ver más →
+            </a>
+          </div>
+          <div className="rounded-lg shadow-md bg-white p-6">
+            <Image
+              src="/wsm.png"
+              alt="Gestión de aptitudes Psicofísicas"
+              width={600}
+              height={400}
+              className="rounded-md mb-4 object-cover w-full h-40"
+            />
+            <h4 className="text-xl font-semibold mb-2">
+              Plataforma de gestión de aptitudes Psicofísicas CatSalut
+            </h4>
+            <p className="text-sm text-gray-600 mb-2">
+              Aplicación para gestionar los formularios de aptitudes psicofísicas de CatSalut, permitiendo acelerar los procesos de gestión.
+            </p>
+            <a
+              href="https://wsm.icsgencat.cat/questionarivaloracio/"
+              className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
+            >
+              Ver más →
+            </a>
+          </div>
+          <div className="rounded-lg shadow-md bg-white p-6">
+            <Image
+              src="/aaa.png"
+              alt="Asistente a actos de salut"
+              width={600}
+              height={400}
+              className="rounded-md mb-4 object-cover w-full h-40"
+            />
+            <h4 className="text-xl font-semibold mb-2">
+              Plataforma de gestión de actos Gencat
+            </h4>
+            <p className="text-sm text-gray-600 mb-2">
+              Descripción breve de tu proyecto, tecnologías utilizadas y objetivos alcanzados.
+            </p>
+            <a
+              href="https://assistentsactes.salut.gencat.cat/agenda"
+              className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
+            >
+              Ver más →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección "Contacto" con formulario */}
+      <section className="w-full max-w-5xl px-6 py-12">
+        <h3 className="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500">
+          Contacto
+        </h3>
+        <p className="leading-relaxed mb-6 text-lg text-center">
+          ¿Tienes un proyecto en mente o necesitas asesoría? ¡Contáctame y trabajemos juntos!
+        </p>
+        <form onSubmit={handleSubmit} className="max-w-xl mx-auto flex flex-col gap-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Nombre"
+            value={contactData.name}
+            onChange={handleChange}
+            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            required
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <input
+            type="email"
+            name="email"
+            placeholder="Correo electrónico"
+            value={contactData.email}
+            onChange={handleChange}
+            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            required
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+          <input
+            type="text"
+            name="subject"
+            placeholder="Asunto"
+            value={contactData.subject}
+            onChange={handleChange}
+            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            required
           />
-          Go to nextjs.org →
-        </a>
+          <textarea
+            name="message"
+            placeholder="Mensaje"
+            value={contactData.message}
+            onChange={handleChange}
+            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            rows={5}
+            required
+          ></textarea>
+          <button
+            type="submit"
+            className="bg-indigo-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-indigo-700 transition-colors text-lg font-semibold"
+          >
+            Enviar mensaje
+          </button>
+        </form>
+        {status && <p className="mt-4 text-center text-lg">{status}</p>}
+      </section>
+
+      {/* Footer */}
+      <footer className="w-full py-4 flex items-center justify-center bg-gray-100 mt-auto">
+        <p className="text-sm text-gray-500">© {new Date().getFullYear()} Octavio Bernal Vilana</p>
       </footer>
-    </div>
+
+      <style jsx>{`
+        .typewriter {
+          display: inline-block;
+          overflow: hidden;
+          white-space: nowrap;
+          border-right: 0.15em solid rgba(255, 255, 255, 0.75);
+          background: linear-gradient(90deg,rgb(255, 217, 0),rgb(255, 83, 30));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: typewriter 4s steps(21, end) infinite, blink-caret 0.75s step-end infinite;
+        }
+        @keyframes typewriter {
+          0% { width: 0ch; }
+          50% { width: 21ch; }
+          60% { width: 21ch; }
+          100% { width: 0ch; }
+        }
+        @keyframes blink-caret {
+          from, to { border-color: transparent; }
+          50% { border-color: rgba(255, 255, 255, 0.75); }
+        }
+      `}</style>
+    </main>
   );
 }
