@@ -149,8 +149,8 @@ export default function Home() {
             className="rounded-full border-4 border-white"
           />
         </div>
-        {/* Nombre con efecto typewriter con nuevos colores */}
-        <h1 className="typewriter text-5xl sm:text-7xl font-bold mb-4 text-center">
+        {/* Nombre con efecto typewriter; ahora responsive en móviles */}
+        <h1 className="typewriter text-3xl sm:text-5xl md:text-7xl font-bold mb-4 text-center">
           Octavio Bernal Vilana
         </h1>
         {/* Iconos sociales en contenedores */}
@@ -273,10 +273,7 @@ export default function Home() {
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           {articles.map((article, idx) => (
-            <div
-              key={idx}
-              className="rounded-lg shadow-md bg-white p-6 flex flex-col"
-            >
+            <div key={idx} className="rounded-lg shadow-md bg-white p-6 flex flex-col">
               <h4 className="text-xl font-semibold mb-2">{article.title}</h4>
               <p className="text-sm text-gray-500 mb-1">{article.date}</p>
               <p className="text-sm text-gray-700 mb-4">{article.summary}</p>
@@ -454,7 +451,7 @@ export default function Home() {
           overflow: hidden;
           white-space: nowrap;
           border-right: 0.15em solid rgba(255, 255, 255, 0.75);
-          background: linear-gradient(90deg,rgb(255, 217, 0),rgb(255, 83, 30));
+          background: linear-gradient(90deg,rgb(255, 196, 0),rgb(255, 75, 30));
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           animation: typewriter 4s steps(21, end) infinite, blink-caret 0.75s step-end infinite;
