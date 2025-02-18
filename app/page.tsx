@@ -2,34 +2,90 @@
 import Image from "next/image";
 import { useState } from "react";
 
-// Función para enviar email directamente desde el cliente (¡exponer la API key es peligroso!)
+// Función modificada para apuntar al endpoint que hemos creado
 async function sendEmail(contactData: {
   name: string;
   email: string;
   subject: string;
   message: string;
 }) {
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await fetch("/api/send-email", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // Se envía la API key en el header Authorization (expuesta en el cliente)
-      Authorization: "Bearer re_X4o7g7VW_4GLWb1FaXQ1eQywCJVs4BkiQ",
     },
-    body: JSON.stringify({
-      from: "onboarding@resend.dev",
-      to: "octabevi@protonmail.com",
-      subject: `Nuevo mensaje de ${contactData.name}: ${contactData.subject}`,
-      html: `<p><strong>Nombre:</strong> ${contactData.name}</p>
-             <p><strong>Email:</strong> ${contactData.email}</p>
-             <p><strong>Mensaje:</strong></p>
-             <p>${contactData.message}</p>`,
-    }),
+    body: JSON.stringify(contactData),
   });
+  
+  if (!res.ok) {
+    throw new Error("Error al enviar el mensaje");
+  }
+  
   return res.json();
 }
 
 export default function Home() {
+  // Estado para el idioma: "es" o "en"
+  const [language, setLanguage] = useState<"es" | "en">("es");
+
+  // Traducciones para cada sección
+  const texts = {
+    es: {
+      heroTitle: "Octavio Bernal Vilana",
+      heroSubtitle: "Full Stack Developer & IT Manager",
+      heroDescription:
+        "¡Hola! Soy un apasionado de la tecnología, el desarrollo de software y la gestión de infraestructuras IT. Me encanta resolver problemas y construir soluciones modernas que destaquen por su rendimiento y calidad.",
+      aboutTitle: "Sobre mí",
+      aboutText:
+        "Llevo varios años trabajando como desarrollador Full Stack, manejando tanto frontend como backend. Además, soy IT Manager, lo que me permite coordinar equipos y asegurar la disponibilidad de servicios de forma eficiente. Me apasionan las tecnologías web, la arquitectura de software y el trabajo colaborativo.",
+      technologiesTitle: "Tecnologías",
+      articlesTitle: "Artículos Recientes",
+      featuredProjectsTitle: "Proyectos Destacados",
+      contactTitle: "Contacto",
+      contactDescription:
+        "¿Tienes un proyecto en mente o necesitas asesoría? ¡Contáctame y trabajemos juntos!",
+      modalMessage: "Mensaje enviado correctamente.",
+      sendButton: "Enviar mensaje",
+      placeholders: {
+        name: "Nombre",
+        email: "Correo electrónico",
+        subject: "Asunto",
+        message: "Mensaje",
+      },
+      sending: "Enviando...",
+      error: "Error al enviar el mensaje. Inténtalo de nuevo.",
+      modalButton: "Aceptar",
+    },
+    en: {
+      heroTitle: "Octavio Bernal Vilana",
+      heroSubtitle: "Full Stack Developer & IT Manager",
+      heroDescription:
+        "Hello! I am passionate about technology, software development, and IT management. I love solving problems and building modern solutions that stand out for their performance and quality.",
+      aboutTitle: "About Me",
+      aboutText:
+        "I have been working as a Full Stack Developer, handling both frontend and backend. I am also an IT Manager, which allows me to coordinate teams and ensure efficient service availability. I am passionate about web technologies, software architecture, and collaborative work.",
+      technologiesTitle: "Technologies",
+      articlesTitle: "Recent Articles",
+      featuredProjectsTitle: "Featured Projects",
+      contactTitle: "Contact",
+      contactDescription:
+        "Do you have a project in mind or need advice? Contact me and let's work together!",
+      modalMessage: "Message sent successfully.",
+      sendButton: "Send message",
+      placeholders: {
+        name: "Name",
+        email: "Email",
+        subject: "Subject",
+        message: "Message",
+      },
+      sending: "Sending...",
+      error: "Error sending message. Please try again.",
+      modalButton: "OK",
+    },
+  };
+
+  const currentText = texts[language];
+
   const technologies = [
     { name: "Java", gradient: "from-red-500 to-yellow-500" },
     { name: "Spring Boot", gradient: "from-green-500 to-blue-500" },
@@ -103,27 +159,37 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("Enviando...");
+    setStatus(currentText.sending);
     try {
       const response = await sendEmail(contactData);
       console.log(response);
-      setStatus("Mensaje enviado correctamente.");
+      setStatus(currentText.modalMessage);
       setContactData({ name: "", email: "", subject: "", message: "" });
       setShowModal(true);
     } catch (error) {
       console.error(error);
-      setStatus("Error al enviar el mensaje. Inténtalo de nuevo.");
+      setStatus(currentText.error);
     }
   };
 
   return (
-    <main className="min-h-screen w-full flex flex-col items-center bg-gray-50 text-gray-800 font-sans">
+    <main className="min-h-screen w-full flex flex-col items-center bg-gray-50 text-gray-800 font-sans relative">
+      {/* Botón de idioma en la esquina superior derecha */}
+      <div className="absolute top-4 right-4">
+        <button
+          onClick={() => setLanguage(language === "es" ? "en" : "es")}
+          className="px-4 py-2 bg-gray-200 rounded"
+        >
+          {language === "es" ? "English" : "Español"}
+        </button>
+      </div>
+
       {/* Modal de éxito */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 text-center">
             <p className="mb-4 text-lg font-semibold">
-              Mensaje enviado correctamente.
+              {currentText.modalMessage}
             </p>
             <button
               onClick={() => {
@@ -132,13 +198,13 @@ export default function Home() {
               }}
               className="bg-indigo-600 text-white px-4 py-2 rounded-md"
             >
-              Aceptar
+              {currentText.modalButton}
             </button>
           </div>
         </div>
       )}
 
-      {/* Portada (Hero Section) con nuevo gradient moderno */}
+      {/* Portada (Hero Section) */}
       <section className="w-full h-[80vh] flex flex-col justify-center items-center bg-gradient-to-br from-teal-500 to-blue-500 text-white px-8">
         <div className="mb-6">
           <Image
@@ -149,11 +215,10 @@ export default function Home() {
             className="rounded-full border-4 border-white"
           />
         </div>
-        {/* Nombre con efecto typewriter; ahora responsive en móviles */}
         <h1 className="typewriter text-3xl sm:text-5xl md:text-7xl font-bold mb-4 text-center">
-          Octavio Bernal Vilana
+          {currentText.heroTitle}
         </h1>
-        {/* Iconos sociales en contenedores */}
+        {/* Iconos sociales */}
         <div className="flex gap-4 mb-4">
           <a
             href="https://www.linkedin.com/in/octavio-bernal-vilana-lk/"
@@ -227,32 +292,27 @@ export default function Home() {
           </a>
         </div>
         <h2 className="text-2xl sm:text-3xl font-semibold mb-6 text-center">
-          Full Stack Developer &amp; IT Manager
+          {currentText.heroSubtitle}
         </h2>
         <p className="max-w-xl text-center text-lg">
-          ¡Hola! Soy un apasionado de la tecnología, el desarrollo de software y la
-          gestión de infraestructuras IT. Me encanta resolver problemas y construir
-          soluciones modernas que destaquen por su rendimiento y calidad.
+          {currentText.heroDescription}
         </p>
       </section>
 
-      {/* Sección "Sobre mí" */}
+      {/* Sección "Sobre mí" / "About Me" */}
       <section className="w-full max-w-5xl px-6 py-12">
         <h3 className="text-3xl sm:text-4xl font-extrabold mb-4 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-          Sobre mí
+          {currentText.aboutTitle}
         </h3>
         <p className="leading-relaxed text-lg text-center">
-          Llevo varios años trabajando como desarrollador Full Stack, manejando tanto
-          frontend como backend. Además, soy IT Manager, lo que me permite coordinar equipos
-          y asegurar la disponibilidad de servicios de forma eficiente. Me apasionan las
-          tecnologías web, la arquitectura de software y el trabajo colaborativo.
+          {currentText.aboutText}
         </p>
       </section>
 
-      {/* Sección "Tecnologías" */}
+      {/* Sección "Tecnologías" / "Technologies" */}
       <section className="w-full max-w-5xl px-6 py-12">
         <h3 className="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">
-          Tecnologías
+          {currentText.technologiesTitle}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
           {technologies.map((tech, idx) => (
@@ -266,10 +326,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sección "Artículos Recientes" */}
+      {/* Sección "Artículos Recientes" / "Recent Articles" */}
       <section className="w-full max-w-5xl px-6 py-12">
         <h3 className="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-          Artículos Recientes
+          {currentText.articlesTitle}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           {articles.map((article, idx) => (
@@ -292,10 +352,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sección "Proyectos Destacados" */}
+      {/* Sección "Proyectos Destacados" / "Featured Projects" */}
       <section className="w-full max-w-5xl px-6 py-12">
         <h3 className="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
-          Proyectos Destacados
+          {currentText.featuredProjectsTitle}
         </h3>
         <div className="grid gap-8 sm:grid-cols-2">
           <div className="rounded-lg shadow-md bg-white p-6">
@@ -385,19 +445,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sección "Contacto" con formulario */}
+      {/* Sección "Contacto" / "Contact" */}
       <section className="w-full max-w-5xl px-6 py-12">
         <h3 className="text-3xl sm:text-4xl font-extrabold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-red-500">
-          Contacto
+          {currentText.contactTitle}
         </h3>
         <p className="leading-relaxed mb-6 text-lg text-center">
-          ¿Tienes un proyecto en mente o necesitas asesoría? ¡Contáctame y trabajemos juntos!
+          {currentText.contactDescription}
         </p>
         <form onSubmit={handleSubmit} className="max-w-xl mx-auto flex flex-col gap-4">
           <input
             type="text"
             name="name"
-            placeholder="Nombre"
+            placeholder={currentText.placeholders.name}
             value={contactData.name}
             onChange={handleChange}
             className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
@@ -406,7 +466,7 @@ export default function Home() {
           <input
             type="email"
             name="email"
-            placeholder="Correo electrónico"
+            placeholder={currentText.placeholders.email}
             value={contactData.email}
             onChange={handleChange}
             className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
@@ -415,7 +475,7 @@ export default function Home() {
           <input
             type="text"
             name="subject"
-            placeholder="Asunto"
+            placeholder={currentText.placeholders.subject}
             value={contactData.subject}
             onChange={handleChange}
             className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
@@ -423,7 +483,7 @@ export default function Home() {
           />
           <textarea
             name="message"
-            placeholder="Mensaje"
+            placeholder={currentText.placeholders.message}
             value={contactData.message}
             onChange={handleChange}
             className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600"
@@ -434,7 +494,7 @@ export default function Home() {
             type="submit"
             className="bg-indigo-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-indigo-700 transition-colors text-lg font-semibold"
           >
-            Enviar mensaje
+            {currentText.sendButton}
           </button>
         </form>
         {status && <p className="mt-4 text-center text-lg">{status}</p>}
@@ -451,7 +511,7 @@ export default function Home() {
           overflow: hidden;
           white-space: nowrap;
           border-right: 0.15em solid rgba(255, 255, 255, 0.75);
-          background: linear-gradient(90deg,rgb(255, 196, 0),rgb(255, 75, 30));
+          background: linear-gradient(90deg, rgb(255, 196, 0), rgb(255, 75, 30));
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           animation: typewriter 4s steps(21, end) infinite, blink-caret 0.75s step-end infinite;
