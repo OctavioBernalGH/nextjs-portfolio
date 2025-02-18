@@ -16,11 +16,11 @@ async function sendEmail(contactData: {
     },
     body: JSON.stringify(contactData),
   });
-  
+
   if (!res.ok) {
     throw new Error("Error al enviar el mensaje");
   }
-  
+
   return res.json();
 }
 
@@ -28,7 +28,7 @@ export default function Home() {
   // Estado para el idioma: "es" o "en"
   const [language, setLanguage] = useState<"es" | "en">("es");
 
-  // Traducciones para cada sección
+  // Traducciones para cada sección, incluyendo artículos y cards
   const texts = {
     es: {
       heroTitle: "Octavio Bernal Vilana",
@@ -55,6 +55,73 @@ export default function Home() {
       sending: "Enviando...",
       error: "Error al enviar el mensaje. Inténtalo de nuevo.",
       modalButton: "Aceptar",
+      featuredProjects: [
+        {
+          title: "Plataforma de Seguridad del paciente: PROSP2",
+          description:
+            "Aplicación para la gestión de listas de verificaciones en ámbitos sanitarios.",
+          link: "https://prosp.salut.gencat.cat/login",
+          image: "/prosp2.png",
+        },
+        {
+          title: "Código IAM (Código del Infarto)",
+          description:
+            "Aplicación utilizada para gestionar el evento e informar sobre el código IAM referente a la detección del infarto.",
+          link: "https://iam.icscampdetarragona.cat/",
+          image: "/iam.png",
+        },
+        {
+          title: "Plataforma de gestión de aptitudes Psicofísicas CatSalut",
+          description:
+            "Aplicación para gestionar los formularios de aptitudes psicofísicas de CatSalut, permitiendo acelerar los procesos de gestión.",
+          link: "https://wsm.ics.gencat.cat/questionarivaloracio/",
+          image: "/wsm.png",
+        },
+        {
+          title: "Plataforma de gestión de actos Gencat",
+          description:
+            "Descripción breve de tu proyecto, tecnologías utilizadas y objetivos alcanzados.",
+          link: "https://assistentsactes.salut.gencat.cat/agenda",
+          image: "/aaa.png",
+        },
+      ],
+      articles: [
+        {
+          title: "ASP.NET Core 9.0 API with Angular",
+          date: "Noviembre 19, 2024",
+          summary:
+            "Tutorial de cómo crear un proyecto con ASP.NET Core 9.0 integrado con AngularJs.",
+          link: "https://javascript.plainenglish.io/asp-net-core-9-0-api-with-angular-332c70072e17",
+        },
+        {
+          title: "Top 10 Laravel Plugins",
+          date: "Julio 25, 2024",
+          summary:
+            "Descubre los 10 plugins más utilizados y conocidos para Laravel.",
+          link: "https://medium.com/stackademic/top-10-laravel-plugins-d7786e9ceb02",
+        },
+        {
+          title: "5 Amazing UI Libraries for Next.js",
+          date: "Julio 25, 2024",
+          summary:
+            "Descubre cinco de las mejores librerías UI para Next.js.",
+          link: "https://medium.com/@octabevi/5-amazing-ui-libraries-for-next-js-2f9417cd7a99",
+        },
+        {
+          title: "Create Next.js project with JWT Authentication and Prisma ORM",
+          date: "Julio 21, 2024",
+          summary:
+            "Creación de un proyecto en Next.js con autenticación mediante JWT y Prisma.",
+          link: "https://medium.com/stackademic/create-next-js-project-with-jwt-authentication-and-prisma-orm-5a08f547cdb4",
+        },
+        {
+          title: "Top 5 Visual Studio Code Plugins for Next.js Development",
+          date: "Julio 25, 2024",
+          summary:
+            "Descubre cinco plugins de Next.js para Visual Studio Code.",
+          link: "https://medium.com/@octabevi/top-5-visual-studio-code-plugins-for-next-js-development-de3717ff6072",
+        },
+      ],
     },
     en: {
       heroTitle: "Octavio Bernal Vilana",
@@ -81,6 +148,73 @@ export default function Home() {
       sending: "Sending...",
       error: "Error sending message. Please try again.",
       modalButton: "OK",
+      featuredProjects: [
+        {
+          title: "Patient Safety Platform: PROSP2",
+          description:
+            "Application for managing checklists in healthcare settings.",
+          link: "https://prosp.salut.gencat.cat/login",
+          image: "/prosp2.png",
+        },
+        {
+          title: "IAM Code (Heart Attack Code)",
+          description:
+            "Application used to manage the event and report on the IAM code for heart attack detection.",
+          link: "https://iam.icscampdetarragona.cat/",
+          image: "/iam.png",
+        },
+        {
+          title: "CatSalut Psychophysical Aptitude Management Platform",
+          description:
+            "Application to manage CatSalut psychophysical aptitude forms, speeding up management processes.",
+          link: "https://wsm.ics.gencat.cat/questionarivaloracio/",
+          image: "/wsm.png",
+        },
+        {
+          title: "Gencat Event Management Platform",
+          description:
+            "Brief description of your project, technologies used, and achieved goals.",
+          link: "https://assistentsactes.salut.gencat.cat/agenda",
+          image: "/aaa.png",
+        },
+      ],
+      articles: [
+        {
+          title: "ASP.NET Core 9.0 API with Angular",
+          date: "November 19, 2024",
+          summary:
+            "Tutorial on how to create a project with ASP.NET Core 9.0 integrated with AngularJs.",
+          link: "https://javascript.plainenglish.io/asp-net-core-9-0-api-with-angular-332c70072e17",
+        },
+        {
+          title: "Top 10 Laravel Plugins",
+          date: "July 25, 2024",
+          summary:
+            "Discover the 10 most used and well-known plugins for Laravel.",
+          link: "https://medium.com/stackademic/top-10-laravel-plugins-d7786e9ceb02",
+        },
+        {
+          title: "5 Amazing UI Libraries for Next.js",
+          date: "July 25, 2024",
+          summary:
+            "Discover five of the best UI libraries for Next.js.",
+          link: "https://medium.com/@octabevi/5-amazing-ui-libraries-for-next-js-2f9417cd7a99",
+        },
+        {
+          title: "Create Next.js Project with JWT Authentication and Prisma ORM",
+          date: "July 21, 2024",
+          summary:
+            "Creation of a Next.js project with JWT authentication and Prisma.",
+          link: "https://medium.com/stackademic/create-next-js-project-with-jwt-authentication-and-prisma-orm-5a08f547cdb4",
+        },
+        {
+          title: "Top 5 VS Code Plugins for Next.js Development",
+          date: "July 25, 2024",
+          summary:
+            "Discover five Next.js plugins for Visual Studio Code.",
+          link: "https://medium.com/@octabevi/top-5-visual-studio-code-plugins-for-next-js-development-de3717ff6072",
+        },
+      ],
     },
   };
 
@@ -101,44 +235,6 @@ export default function Home() {
     { name: "HTML", gradient: "from-orange-400 to-orange-600" },
     { name: "CSS", gradient: "from-blue-400 to-blue-600" },
     { name: "TailwindCSS", gradient: "from-sky-400 to-blue-400" },
-  ];
-
-  const articles = [
-    {
-      title: "ASP.NET Core 9.0 API with Angular",
-      date: "Noviembre 19, 2024",
-      summary:
-        "Tutorial de como crear un proyecto con ASP.NET Core 9.0 integrado con AngularJs",
-      link: "https://javascript.plainenglish.io/asp-net-core-9-0-api-with-angular-332c70072e17",
-    },
-    {
-      title: "Top 10 Laravel Plugins",
-      date: "Julio 25, 2024",
-      summary:
-        "Descubre los 10 plugins más utilizados y conocidos para Laravel",
-      link: "https://medium.com/stackademic/top-10-laravel-plugins-d7786e9ceb02",
-    },
-    {
-      title: "5 Amazing UI Libraries for Next.js",
-      date: "Julio 25, 2024",
-      summary:
-        "Descubre cinco de las mejores librerías UI para Next.js",
-      link: "https://medium.com/@octabevi/5-amazing-ui-libraries-for-next-js-2f9417cd7a99",
-    },
-    {
-      title: "Create Next.js project with JWT Authentication and Prisma ORM",
-      date: "Julio 21, 2024",
-      summary:
-        "Creación de un projecto en Next.js con autenticación mediante JWT y Prisma",
-      link: "https://medium.com/stackademic/create-next-js-project-with-jwt-authentication-and-prisma-orm-5a08f547cdb4",
-    },
-    {
-      title: "Top 5 Visual Studio Code Plugins for Next.js Development",
-      date: "Julio 25, 2024",
-      summary:
-        "Descubre cinco plugins de Next.js para Visual Studio Code",
-      link: "https://medium.com/@octabevi/top-5-visual-studio-code-plugins-for-next-js-development-de3717ff6072",
-    },
   ];
 
   // Estados para el formulario y modal de contacto
@@ -174,13 +270,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen w-full flex flex-col items-center bg-gray-50 text-gray-800 font-sans relative">
-      {/* Botón de idioma en la esquina superior derecha */}
+      {/* Botón de idioma en la esquina superior derecha con bandera */}
       <div className="absolute top-4 right-4">
         <button
           onClick={() => setLanguage(language === "es" ? "en" : "es")}
           className="px-4 py-2 bg-gray-200 rounded"
         >
-          {language === "es" ? "English" : "Español"}
+          {language === "es" ? "🇺🇸" : "🇪🇸"}
         </button>
       </div>
 
@@ -332,7 +428,7 @@ export default function Home() {
           {currentText.articlesTitle}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-          {articles.map((article, idx) => (
+          {currentText.articles.map((article, idx) => (
             <div key={idx} className="rounded-lg shadow-md bg-white p-6 flex flex-col">
               <h4 className="text-xl font-semibold mb-2">{article.title}</h4>
               <p className="text-sm text-gray-500 mb-1">{article.date}</p>
@@ -344,7 +440,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold"
                 >
-                  Leer más →
+                  {language === "es" ? "Leer más →" : "Read more →"}
                 </a>
               </div>
             </div>
@@ -358,90 +454,25 @@ export default function Home() {
           {currentText.featuredProjectsTitle}
         </h3>
         <div className="grid gap-8 sm:grid-cols-2">
-          <div className="rounded-lg shadow-md bg-white p-6">
-            <Image
-              src="/prosp2.png"
-              alt="Plataforma PROSP2"
-              width={600}
-              height={400}
-              className="rounded-md mb-4 object-cover w-full h-40"
-            />
-            <h4 className="text-xl font-semibold mb-2">
-              Plataforma de Seguridad del paciente: PROSP2
-            </h4>
-            <p className="text-sm text-gray-600 mb-2">
-              Aplicación para la gestión de listas de verificaciones en ámbitos sanitarios.
-            </p>
-            <a
-              href="https://prosp.salut.gencat.cat/login"
-              className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
-            >
-              Ver más →
-            </a>
-          </div>
-          <div className="rounded-lg shadow-md bg-white p-6">
-            <Image
-              src="/iam.png"
-              alt="Código del infarto"
-              width={600}
-              height={400}
-              className="rounded-md mb-4 object-cover w-full h-40"
-            />
-            <h4 className="text-xl font-semibold mb-2">
-              Código IAM (Código del Infarto)
-            </h4>
-            <p className="text-sm text-gray-600 mb-2">
-              Aplicación utilizada para gestionar el evento e informar sobre el código IAM referente a la detección del infarto.
-            </p>
-            <a
-              href="https://iam.icscampdetarragona.cat/"
-              className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
-            >
-              Ver más →
-            </a>
-          </div>
-          <div className="rounded-lg shadow-md bg-white p-6">
-            <Image
-              src="/wsm.png"
-              alt="Gestión de aptitudes Psicofísicas"
-              width={600}
-              height={400}
-              className="rounded-md mb-4 object-cover w-full h-40"
-            />
-            <h4 className="text-xl font-semibold mb-2">
-              Plataforma de gestión de aptitudes Psicofísicas CatSalut
-            </h4>
-            <p className="text-sm text-gray-600 mb-2">
-              Aplicación para gestionar los formularios de aptitudes psicofísicas de CatSalut, permitiendo acelerar los procesos de gestión.
-            </p>
-            <a
-              href="https://wsm.icsgencat.cat/questionarivaloracio/"
-              className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
-            >
-              Ver más →
-            </a>
-          </div>
-          <div className="rounded-lg shadow-md bg-white p-6">
-            <Image
-              src="/aaa.png"
-              alt="Asistente a actos de salut"
-              width={600}
-              height={400}
-              className="rounded-md mb-4 object-cover w-full h-40"
-            />
-            <h4 className="text-xl font-semibold mb-2">
-              Plataforma de gestión de actos Gencat
-            </h4>
-            <p className="text-sm text-gray-600 mb-2">
-              Descripción breve de tu proyecto, tecnologías utilizadas y objetivos alcanzados.
-            </p>
-            <a
-              href="https://assistentsactes.salut.gencat.cat/agenda"
-              className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
-            >
-              Ver más →
-            </a>
-          </div>
+          {currentText.featuredProjects.map((proj, idx) => (
+            <div key={idx} className="rounded-lg shadow-md bg-white p-6">
+              <Image
+                src={proj.image}
+                alt={proj.title}
+                width={600}
+                height={400}
+                className="rounded-md mb-4 object-cover w-full h-40"
+              />
+              <h4 className="text-xl font-semibold mb-2">{proj.title}</h4>
+              <p className="text-sm text-gray-600 mb-2">{proj.description}</p>
+              <a
+                href={proj.link}
+                className="inline-block mt-2 text-indigo-600 hover:text-indigo-800"
+              >
+                {language === "es" ? "Ver más →" : "See more →"}
+              </a>
+            </div>
+          ))}
         </div>
       </section>
 
