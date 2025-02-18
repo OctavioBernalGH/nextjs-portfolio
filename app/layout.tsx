@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Obernal Portfolio",
+  title: "Octavio Bernal Portfolio",
   description: "Portfolio de Octavio Bernal Vilana, Full Stack Developer & IT Manager",
 };
 
